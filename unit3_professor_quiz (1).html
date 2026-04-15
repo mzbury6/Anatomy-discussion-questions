@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 Professor Question Quiz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#f7f6f1;color:#1a1a1a;padding:24px 20px;max-width:900px;margin:0 auto;}
+h1{font-family:'DM Serif Display',Georgia,serif;font-size:28px;font-weight:400;margin-bottom:4px;}
+.meta{font-size:13px;color:#888;margin-bottom:6px;}
+.source-note{font-size:12px;color:#aaa;background:#fff;border:1px solid #e8e6de;border-radius:8px;padding:8px 14px;margin-bottom:20px;line-height:1.5;}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;align-items:center;}
+.ctrl-label{font-size:12px;color:#888;}
+select{padding:7px 12px;border:1px solid #ddd;border-radius:20px;font-size:13px;background:#fff;font-family:'DM Sans',sans-serif;color:#1a1a1a;cursor:pointer;}
+.btn{padding:7px 18px;border-radius:20px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;}
+.btn-primary{background:#1a1a1a;color:#fff;border:none;}
+.btn-outline{background:#fff;color:#1a1a1a;border:1px solid #ccc;}
+.scorebar{background:#fff;border-radius:12px;padding:14px 20px;border:1px solid #e8e6de;margin-bottom:20px;display:flex;gap:24px;flex-wrap:wrap;align-items:center;}
+.score-num{font-size:24px;font-weight:600;}
+.score-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;}
+.score-pct{font-size:24px;font-weight:600;}
+.section-hdr{font-size:12px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid #e8e6de;}
+.section-hdr:first-child{margin-top:0;}
+.q-card{background:#fff;border-radius:12px;padding:20px 22px;border:1px solid #e8e6de;margin-bottom:12px;}
+.q-card.right{border-color:#1D9E75;}
+.q-card.wrong{border-color:#D85A30;}
+.q-meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em;}
+.bc{background:#f0ede6;color:#555;}
+.ba{background:#e8e7fd;color:#3C3489;}
+.bu{background:#daeaf9;color:#0C447C;}
+.br{background:#e8e6de;color:#666;}
+.q-author{font-size:11px;color:#bbb;margin-left:auto;}
+.q-text{font-size:15px;color:#1a1a1a;line-height:1.55;margin-bottom:14px;font-style:italic;}
+.opts{display:flex;flex-direction:column;gap:7px;}
+.opt{padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;text-align:left;font-family:'DM Sans',sans-serif;color:#1a1a1a;transition:all 0.15s;line-height:1.4;}
+.opt:hover:not(:disabled){border-color:#999;background:#fafaf7;}
+.opt:disabled{cursor:default;}
+.opt.correct{background:#d4f0e5;border-color:#1D9E75;color:#085041;font-weight:500;}
+.opt.wrong{background:#fce5da;border-color:#D85A30;color:#993C1D;}
+.opt.reveal{background:#f5f5f0;border-color:#ccc;color:#888;}
+.fb{font-size:13px;line-height:1.6;padding:10px 14px;border-radius:8px;margin-top:10px;display:none;}
+.fb.show{display:block;}
+.fb.ok{background:#d4f0e5;color:#085041;}
+.fb.no{background:#fce5da;color:#993C1D;}
+.empty{text-align:center;padding:48px;color:#888;font-size:15px;}
+</style>
+</head>
+<body>
+
+<h1>Professor's Question Quiz</h1>
+<p class="meta">Questions exactly as written in the posted learning outcome documents</p>
+<div class="source-note">These questions were posted by your classmates and professor for Concepts A, B, C, D, E, F, G, H, and I. All recall, understand, and apply questions are included.</div>
+
+<div class="controls">
+  <span class="ctrl-label">Concept:</span>
+  <select id="sel-c" onchange="render()">
+    <option value="all">All concepts</option>
+    <option value="A">A — Vertebral column</option>
+    <option value="B">B — Axial muscles</option>
+    <option value="C">C — Brain structure</option>
+    <option value="D">D — Spinal cord</option>
+    <option value="E">E — Cranial &amp; spinal nerves</option>
+    <option value="F">F — Functional NS</option>
+    <option value="G">G — Eye &amp; ear</option>
+    <option value="H">H — Circulation</option>
+    <option value="I">I — Meninges &amp; ventricles</option>
+  </select>
+  <span class="ctrl-label">Level:</span>
+  <select id="sel-l" onchange="render()">
+    <option value="all">All levels</option>
+    <option value="R">Recall</option>
+    <option value="U">Understand</option>
+    <option value="A">Apply</option>
+  </select>
+  <button class="btn btn-primary" onclick="resetAll()">Reset</button>
+  <button class="btn btn-outline" onclick="shuffleRender()">Shuffle</button>
+</div>
+
+<div class="scorebar">
+  <div><div class="score-num" id="sc-c" style="color:#1D9E75">0</div><div class="score-label">Correct</div></div>
+  <div><div class="score-num" id="sc-w" style="color:#D85A30">0</div><div class="score-label">Wrong</div></div>
+  <div><div class="score-num" id="sc-r">0</div><div class="score-label">Left</div></div>
+  <div><div class="score-pct" id="sc-p" style="color:#888">—</div><div class="score-label">Score</div></div>
+</div>
+
+<div id="qwrap"></div>
+
+<script>
+const QS = [
+  // ===== CONCEPT A (Olivier, Marysa, Brady) =====
+  {c:'A',lo:'LO1',lv:'R',author:'Olivier/Marysa/Brady',
+   q:'Name the different functions of the vertebral column.',
+   opts:['Protection of spinal cord, structural support, and limitation of torso movement','Blood production, fat storage, and hormone secretion','Only protects the spinal cord — no other functions','Supports the skull and facilitates breathing only'],
+   ans:0,exp:'The vertebral column has three main functions: (1) protects the spinal cord in the vertebral canal, (2) provides structural support for the upright body, and (3) limits excessive torso movement.'},
+  {c:'A',lo:'LO1',lv:'U',author:'Olivier/Marysa/Brady',
+   q:'Which function would be most limited if someone had a fracture of the vertebral column?',
+   opts:['Protection of the spinal cord — fracture could collapse the vertebral canal','Structural support — fractured vertebrae can still support upright posture','Limitation of torso movement — mobility increases with fracture','Blood production — bone marrow would be destroyed'],
+   ans:0,exp:'A vertebral fracture can compromise the vertebral canal and expose or damage the spinal cord inside — eliminating its protective function. This is why spinal fractures are treated as spinal cord injuries until proven otherwise.'},
+  {c:'A',lo:'LO1',lv:'A',author:'Olivier/Marysa/Brady',
+   q:'Name an important structure protected by the vertebral column.',
+   opts:['The spinal cord','The liver','The heart','The lungs'],
+   ans:0,exp:'The spinal cord travels through the vertebral canal formed by the continuous stack of vertebral foramina. This bony protection is the vertebral column\'s most critical function.'},
+  {c:'A',lo:'LO2',lv:'R',author:'Olivier/Marysa/Brady',
+   q:'Name the different regions of the vertebral column and their respective number of vertebrae.',
+   opts:['Cervical 7, Thoracic 12, Lumbar 5, Sacral 5 (fused), Coccyx 3-5 (fused)','Cervical 5, Thoracic 10, Lumbar 7, Sacral 4, Coccyx 2','Cervical 7, Thoracic 10, Lumbar 7, Sacral 5, Coccyx 4','Cervical 12, Thoracic 7, Lumbar 5, Sacral 3, Coccyx 5'],
+   ans:0,exp:'Cervical=7, Thoracic=12, Lumbar=5 (breakfast-lunch-dinner), Sacral=5 fused, Coccyx=3-5 fused. Total = 33 vertebrae.'},
+  {c:'A',lo:'LO2',lv:'A',author:'Olivier/Marysa/Brady',
+   q:'Exploring a mannequin you find a region with 12 vertebrae of similar features. Which region?',
+   opts:['Thoracic — T1–T12, 12 vertebrae with costal facets for rib articulation','Cervical — C1–C7, 7 vertebrae','Lumbar — L1–L5, 5 vertebrae','Sacral — 5 fused vertebrae'],
+   ans:0,exp:'Thoracic = 12 vertebrae (T1–T12). They are also identifiable by heart-shaped bodies and costal facets for rib articulation — unique to this region.'},
+  {c:'A',lo:'LO3',lv:'U',author:'Olivier/Marysa/Brady',
+   q:'At which stage of the lifespan do primary and secondary curvatures develop?',
+   opts:['Primary = present at birth (fetal); Secondary = develop in infancy/childhood after birth','Both primary and secondary develop before birth','Primary develop in childhood; secondary are present at birth','Both types develop simultaneously during adolescence'],
+   ans:0,exp:'Primary curvatures (thoracic + sacral kyphosis) are present at birth — they reflect the fetal C-shape. Secondary curvatures (cervical + lumbar lordosis) develop after birth when the baby begins holding their head up (cervical) and walking (lumbar).'},
+  {c:'A',lo:'LO3',lv:'A',author:'Olivier/Marysa/Brady',
+   q:'True or false: a baby is born with a cervical curvature.',
+   opts:['False — cervical lordosis is a secondary curvature that develops after birth','True — all four curvatures are present from birth','True — cervical curvature is primary','False — babies have completely flat spines at birth'],
+   ans:0,exp:'FALSE. Cervical lordosis is a SECONDARY curvature. It develops in infancy when the baby begins holding their head upright. Only thoracic and sacral curvatures are primary (present at birth).'},
+  {c:'A',lo:'LO4',lv:'U',author:'Olivier/Marysa/Brady',
+   q:'Explain the position of the vertebral foramen relative to the vertebral arch. What structure is formed when vertebral foramina are stacked?',
+   opts:['Vertebral foramen is enclosed by the vertebral arch posteriorly + body anteriorly; stacked foramina = vertebral canal','Vertebral foramen is anterior to the body; stacked foramina form the intervertebral disc space','Vertebral arch surrounds the foramen on all sides; stacking forms the spinous process','Foramen is lateral to the arch; stacking forms the intervertebral foramen'],
+   ans:0,exp:'The vertebral foramen is bordered anteriorly by the vertebral body and posteriorly by the vertebral arch (pedicles + laminae). When foramina are stacked, they form the continuous vertebral canal that houses the spinal cord.'},
+  {c:'A',lo:'LO5',lv:'R',author:'Olivier/Marysa/Brady',
+   q:'Which key anatomical structures differentiate cervical vertebrae from other regions?',
+   opts:['Transverse foramina (for vertebral arteries) and bifid spinous processes','Costal facets and long spinous processes','Massive bodies and no transverse foramina','Fused structure and anterior sacral foramina'],
+   ans:0,exp:'Cervical vertebrae uniquely have: (1) transverse foramina through which the vertebral arteries pass, and (2) bifid (forked/split) spinous processes on C2–C6. No other region has these features.'},
+  {c:'A',lo:'LO5',lv:'A',author:'Olivier/Marysa/Brady',
+   q:'How can you identify the sacral and coccygeal region on an X-ray? Which structure is on the anterior side of the sacrum?',
+   opts:['Sacrum is a fused triangular bone; anterior surface shows sacral foramina and the sacral promontory','Sacrum looks identical to lumbar vertebrae on X-ray','Coccyx is the largest bone visible; sacrum has costal facets','Sacrum shows transverse foramina on X-ray; coccyx has bifid processes'],
+   ans:0,exp:'On X-ray the sacrum is a fused triangular bone (5 fused vertebrae) with anterior sacral foramina visible on the concave anterior surface, plus the sacral promontory (the superior edge where it meets L5).'},
+  {c:'A',lo:'LO6',lv:'U',author:'Olivier/Marysa/Brady',
+   q:'A person has pain caused by a bulging intervertebral disc pressing on a nerve. Describe this condition.',
+   opts:['Disc herniation — nucleus pulposus bulges through annulus fibrosus, compressing nerve root','Scoliosis — lateral spinal deviation causing nerve compression','Kyphosis — posterior curvature compressing discs','Spinal stenosis — bone overgrowth narrowing the canal'],
+   ans:0,exp:'Disc herniation: the inner gel (nucleus pulposus) bulges through a tear in the outer ring (annulus fibrosus) → presses on spinal nerve roots → radiating pain, tingling, numbness, or weakness in the distribution of that nerve.'},
+  {c:'A',lo:'LO6',lv:'A',author:'Olivier/Marysa/Brady',
+   q:'A pregnant woman would normally have an exaggerated curvature in which region?',
+   opts:['Lumbar — increased lumbar lordosis to shift center of gravity back over the feet','Cervical — neck flexes forward to balance the extra weight','Thoracic — increased kyphosis to accommodate the growing uterus','Sacral — the sacrum tilts posteriorly during pregnancy'],
+   ans:0,exp:'Pregnancy shifts the center of gravity anteriorly. To compensate, the lumbar spine extends more (increased lumbar lordosis) to keep the body balanced over the feet. This is also why pregnant women often have low back pain.'},
+
+  // ===== CONCEPT B (Daria) =====
+  {c:'B',lo:'LO7',lv:'R',author:'Daria',
+   q:'List the major groups of axial muscles discussed in class, including those associated with the hyoid bone.',
+   opts:['Facial expression, mastication, sternocleidomastoid, scalenes, suprahyoid, infrahyoid, intrinsic back muscles','Only the erector spinae and sternocleidomastoid','Limb muscles and diaphragm only','Quadriceps, hamstrings, and gluteal muscles'],
+   ans:0,exp:'Axial muscle groups: muscles of facial expression (CN VII), mastication (CN V), neck (SCM + scalenes), suprahyoid (above hyoid — elevate it), infrahyoid (below hyoid — depress it), and intrinsic back muscles (superficial + intermediate groups).'},
+  {c:'B',lo:'LO7',lv:'U',author:'Daria',
+   q:'Explain the functional difference between suprahyoid and infrahyoid muscles in relation to swallowing and speech.',
+   opts:['Suprahyoid elevates the hyoid during swallowing; infrahyoid depresses it afterward to return it to resting position','Infrahyoid elevates the hyoid; suprahyoid only moves the tongue','Both groups elevate the hyoid simultaneously during swallowing','Suprahyoid is for speech only; infrahyoid is for chewing only'],
+   ans:0,exp:'During swallowing: suprahyoid muscles (digastric, mylohyoid, geniohyoid, stylohyoid) elevate the hyoid and larynx. Afterward, infrahyoid muscles (sternohyoid, omohyoid, sternothyroid, thyrohyoid) depress them back to resting position.'},
+  {c:'B',lo:'LO7',lv:'A',author:'Daria',
+   q:'A patient has difficulty depressing the mandible after swallowing. Which muscle group is most likely impaired and why?',
+   opts:['Suprahyoid — these muscles depress the mandible (open the jaw) as well as elevate the hyoid','Infrahyoid — they depress the hyoid after swallowing','Masseter — it closes the jaw, so damage prevents opening','Lateral pterygoid — it protracts the mandible only'],
+   ans:0,exp:'Suprahyoid muscles (especially digastric and mylohyoid) both elevate the hyoid during swallowing AND help depress the mandible (open the jaw) when the mandible is fixed. Damage impairs jaw opening.'},
+  {c:'B',lo:'LO8',lv:'R',author:'Daria',
+   q:'Which cranial nerve innervates muscles of facial expression, and which innervates muscles of mastication?',
+   opts:['CN VII (facial) = facial expression; CN V (trigeminal) = mastication','CN V = facial expression; CN VII = mastication','CN XII = facial expression; CN IX = mastication','CN VII innervates both facial expression and mastication'],
+   ans:0,exp:'CN VII (facial nerve) = all muscles of facial expression. CN V (trigeminal nerve, specifically V3 mandibular branch) = all muscles of mastication. Key exam fact — different nerves for adjacent functions.'},
+  {c:'B',lo:'LO8',lv:'U',author:'Daria',
+   q:'How would damage to CN V differ from damage to CN VII in terms of chewing vs. facial expression?',
+   opts:['CN V damage = cannot chew, facial expression intact; CN VII damage = cannot make facial expressions, chewing intact','CN V damage = lose both chewing and expression; CN VII damage = lose only expression','They are the same nerve so both are always affected together','CN VII damage affects chewing; CN V affects expression'],
+   ans:0,exp:'CN V (trigeminal) innervates masseter, temporalis, pterygoids. Damage = impaired chewing but face still moves. CN VII (facial) innervates all expression muscles. Damage (Bell\'s palsy) = face droops but chewing is fine. Completely separate functions.'},
+  {c:'B',lo:'LO8',lv:'A',author:'Daria',
+   q:'A patient cannot smile but can still chew normally. Which cranial nerve is damaged?',
+   opts:['CN VII (facial nerve) — innervates all muscles of facial expression including zygomaticus for smiling','CN V (trigeminal) — innervates the jaw muscles','CN XII (hypoglossal) — controls tongue movement','CN IX (glossopharyngeal) — controls the pharynx'],
+   ans:0,exp:'Smiling = muscles of facial expression = CN VII. Chewing intact = CN V is fine. CN VII damage (e.g., Bell\'s palsy) = unilateral facial droop, cannot smile, cannot close eye, cannot raise eyebrow on affected side.'},
+  {c:'B',lo:'LO9',lv:'R',author:'Daria',
+   q:'Identify the primary actions of the masseter, temporalis, and orbicularis oculi muscles.',
+   opts:['Masseter = elevates mandible; Temporalis = elevates + retracts mandible; Orbicularis oculi = closes the eye','Masseter = protracts jaw; Temporalis = opens mouth; Orbicularis oculi = opens eye wide','All three are muscles of mastication with identical actions','Masseter = closes eye; Temporalis = elevates hyoid; Orbicularis oculi = chewing'],
+   ans:0,exp:'Masseter = elevates mandible (closes jaw) — main chewer. Temporalis = elevates AND retracts mandible (closes jaw and pulls it back). Orbicularis oculi = closes the eye (wink, blink, squint) — innervated by CN VII.'},
+  {c:'B',lo:'LO9',lv:'A',author:'Daria',
+   q:'A patient cannot protract the mandible or open their jaw properly. Which muscle is most likely affected?',
+   opts:['Lateral pterygoid — it protracts and depresses (opens) the mandible','Masseter — it only elevates the mandible','Medial pterygoid — it only elevates the mandible','Temporalis — it only closes and retracts the jaw'],
+   ans:0,exp:'Lateral pterygoid: pulls the condyle of the mandible forward (protracts) and helps depress (open) the jaw. Bilateral damage = cannot protract or open properly. It\'s the only major jaw muscle that opens the mouth.'},
+  {c:'B',lo:'LO10',lv:'R',author:'Daria',
+   q:'What are the origin and insertion of the sternocleidomastoid (SCM)?',
+   opts:['Origin: sternum and clavicle; Insertion: mastoid process of temporal bone','Origin: mastoid process; Insertion: sternum and clavicle','Origin: occipital bone; Insertion: clavicle only','Origin: hyoid bone; Insertion: temporal bone'],
+   ans:0,exp:'SCM: Sterno- (sternum) + cleido- (clavicle) = origin. -mastoid (mastoid process of temporal bone) = insertion. The name literally spells out the attachments. Classic anatomy naming.'},
+  {c:'B',lo:'LO10',lv:'U',author:'Daria',
+   q:'How do suprahyoid and infrahyoid muscle groups differ in their roles during swallowing?',
+   opts:['Suprahyoid ELEVATES the hyoid/larynx during swallowing; infrahyoid DEPRESSES them back to rest afterward','Both groups act simultaneously to stabilize the hyoid without movement','Infrahyoid elevates; suprahyoid depresses','Suprahyoid controls breathing; infrahyoid controls swallowing'],
+   ans:0,exp:'Swallowing sequence: suprahyoid muscles fire first to ELEVATE the hyoid and larynx (closing off the airway with the epiglottis). After the bolus passes, infrahyoid muscles bring the hyoid and larynx back DOWN. Coordinated elevator-lowering action.'},
+  {c:'B',lo:'LO10',lv:'A',author:'Daria',
+   q:'A patient has difficulty rotating their head to the left. Which muscle is likely impaired and why?',
+   opts:['Right SCM — unilateral contraction of the right SCM rotates the face to the LEFT (opposite side)','Left SCM — it rotates the head to the ipsilateral (same) side','Left trapezius — the trapezius directly rotates the head','Both SCMs — bilateral damage is always required for rotation problems'],
+   ans:0,exp:'Right SCM: tilts head to the RIGHT and rotates face to the LEFT. To rotate left, you need the right SCM. Problem rotating left = right SCM impaired. This contralateral rotation is a classic exam fact.'},
+  {c:'B',lo:'LO11',lv:'R',author:'Daria',
+   q:'What muscles are included in the superficial intrinsic back muscle group?',
+   opts:['Serratus posterior superior and serratus posterior inferior','Erector spinae: iliocostalis, longissimus, spinalis','Multifidus, rotatores, semispinalis','Splenius capitis, splenius cervicis, longissimus'],
+   ans:0,exp:'Superficial intrinsic back = serratus posterior (superior + inferior). These connect vertebrae to ribs and assist respiration. The INTERMEDIATE group = erector spinae (iliocostalis, longissimus, spinalis). The DEEP group = transversospinal (multifidus, rotatores).'},
+  {c:'B',lo:'LO11',lv:'A',author:'Daria',
+   q:'A patient has trouble elevating their ribs during breathing. Which muscle group is likely affected?',
+   opts:['Superficial intrinsic back muscles (serratus posterior superior) — they elevate ribs during inhalation','Erector spinae — they only extend the vertebral column','Multifidus — it only rotates vertebrae','Infrahyoid muscles — they are responsible for breathing'],
+   ans:0,exp:'Serratus posterior SUPERIOR elevates ribs during inhalation (assists inspiration). Serratus posterior INFERIOR depresses ribs during exhalation. Trouble elevating ribs = serratus posterior superior problem.'},
+  {c:'B',lo:'LO12',lv:'U',author:'Daria',
+   q:'How do bilateral vs. unilateral contractions of neck muscles affect head movement differently?',
+   opts:['Unilateral SCM: tilts head same side + rotates face to opposite side; Bilateral SCM: flexes neck (chin to chest)','Bilateral SCM: rotates head; Unilateral: only flexes the neck','Both actions produce identical results regardless of side','Unilateral only flexes; bilateral only rotates'],
+   ans:0,exp:'This is high-yield. Unilateral SCM contraction = tilts head toward the same side + rotates face toward the OPPOSITE side. Bilateral contraction = neck flexion (chin to chest). Same muscle, completely different actions depending on whether one or both sides fire.'},
+  {c:'B',lo:'LO12',lv:'A',author:'Daria',
+   q:'If someone cannot flex their vertebral column forward, which muscle group is most likely weakened?',
+   opts:['Abdominal muscles (rectus abdominis) — they flex the vertebral column anteriorly','Erector spinae — they flex the vertebral column forward','Multifidus — it controls all spinal flexion','Suprahyoid muscles — they indirectly flex the spine'],
+   ans:0,exp:'Flexion of the vertebral column (bending forward) is primarily performed by the abdominal muscles (especially rectus abdominis) and psoas. The erector spinae EXTENDS the spine. Weakness in forward flexion = abdominal/psoas problem.'},
+
+  // ===== CONCEPT C (class questions) =====
+  {c:'C',lo:'LO13',lv:'R',author:'Lura',
+   q:'What are the three major divisions of the brain?',
+   opts:['Cerebrum, cerebellum, brainstem','Frontal, parietal, temporal lobes','Cortex, subcortex, spinal cord','Diencephalon, midbrain, medulla only'],
+   ans:0,exp:'Cerebrum (largest — thinking, sensation, voluntary movement), Cerebellum (coordination and balance — "little brain"), Brainstem (midbrain + pons + medulla — vital life functions).'},
+  {c:'C',lo:'LO13',lv:'U',author:'Lura',
+   q:'Explain how damage to the cerebellum may affect movement.',
+   opts:['Coordination is lost — movement becomes jerky and unsteady (ataxia); balance is impaired','Complete paralysis occurs — the cerebellum initiates all movement','Sensory loss only — motor function is preserved','Only involuntary movements are affected'],
+   ans:0,exp:'The cerebellum doesn\'t initiate movement — it coordinates it. Cerebellar damage = ataxia (uncoordinated gait), intention tremor (tremor when reaching for something), dysmetria (misjudging distances), and balance problems. Patient appears drunk.'},
+  {c:'C',lo:'LO13',lv:'A',author:'Lura',
+   q:'A patient is struggling with balance after a head injury. Which brain division was likely hurt?',
+   opts:['Cerebellum — coordinates balance and movement','Frontal lobe — controls decision-making','Occipital lobe — processes vision','Medulla oblongata — regulates heart rate and breathing'],
+   ans:0,exp:'Balance problems = cerebellum. It receives input from the vestibular system, proprioceptors, and visual system and coordinates smooth, balanced movement. Brainstem damage would affect vital signs, not just balance.'},
+  {c:'C',lo:'LO14',lv:'R',author:'Lura',
+   q:'What does the term "tract" mean in the CNS?',
+   opts:['A bundle of axons within the CNS (contrast: nerve = bundle of axons outside CNS)','A cluster of neuron cell bodies within the CNS (that\'s a nucleus)','A cluster of cell bodies outside the CNS (that\'s a ganglion)','Any myelinated pathway, inside or outside the CNS'],
+   ans:0,exp:'Know all four: Tract = axon bundle INSIDE CNS. Nerve = axon bundle OUTSIDE CNS. Nucleus = cell body cluster INSIDE CNS. Ganglion = cell body cluster OUTSIDE CNS. These definitions are exam-ready.'},
+  {c:'C',lo:'LO14',lv:'A',author:'Lura',
+   q:'A patient has impaired sensory transmission from the spinal cord to the brain. Was a nerve or tract damaged?',
+   opts:['A tract — transmission within the CNS uses tracts (ascending white matter columns)','A nerve — all sensory transmission uses nerves','A ganglion — sensory cell bodies were destroyed','A nucleus — the cell bodies in the cord were damaged'],
+   ans:0,exp:'Transmission FROM spinal cord TO brain = within the CNS = a TRACT (specifically ascending sensory tracts in the white matter columns). If the damage were between the body and the cord, it would be a nerve.'},
+  {c:'C',lo:'LO15',lv:'R',author:'Lura',
+   q:'What are the four major lobes of the cerebrum?',
+   opts:['Frontal, parietal, temporal, occipital','Frontal, limbic, insular, occipital','Parietal, temporal, cerebellar, occipital','Frontal, temporal, diencephalon, occipital'],
+   ans:0,exp:'Four lobes: Frontal (front — motor + executive), Parietal (top — somatosensory + spatial), Temporal (sides — hearing + memory), Occipital (back — vision only). Each separated by named sulci.'},
+  {c:'C',lo:'LO15',lv:'U',author:'Lura',
+   q:'How does the temporal lobe contribute to both auditory processing AND memory?',
+   opts:['It contains the primary auditory cortex AND the hippocampus and amygdala (memory/emotion) in its medial part','The temporal lobe only processes sound — memory is purely frontal','The temporal lobe handles memory only; auditory cortex is in the parietal lobe','There is no connection between the temporal lobe and memory'],
+   ans:0,exp:'Temporal lobe: primary auditory cortex (hearing) on superior surface, Wernicke\'s area (language comprehension), AND the medial temporal lobe contains the hippocampus (memory consolidation) and amygdala (emotional memory). It\'s a multitasker.'},
+  {c:'C',lo:'LO15',lv:'A',author:'Lura',
+   q:'After a head injury Mary experiences trouble with decision making. What lobe was likely affected?',
+   opts:['Frontal lobe — executive function, judgment, and decision-making','Parietal lobe — spatial awareness and sensory processing','Temporal lobe — auditory processing and memory','Occipital lobe — visual processing'],
+   ans:0,exp:'Frontal lobe = executive function (planning, judgment, decision-making, impulse control). It\'s the brain\'s CEO. Damage = poor decisions, personality changes, impulsivity. Classic frontal lobe patient: can function physically but makes terrible choices.'},
+  {c:'C',lo:'LO16',lv:'R',author:'Lura',
+   q:'Which gyrus is primarily associated with motor function?',
+   opts:['Precentral gyrus — primary motor cortex in the frontal lobe','Postcentral gyrus — primary somatosensory cortex in the parietal lobe','Angular gyrus — language processing area','Superior temporal gyrus — auditory processing'],
+   ans:0,exp:'Precentral gyrus = PRIMARY MOTOR CORTEX. Located in the frontal lobe, just anterior to the central sulcus. Contains the motor homunculus. Sends commands out via corticospinal (UMN) tracts.'},
+  {c:'C',lo:'LO16',lv:'A',author:'Lura',
+   q:'Sally is in anatomy class touching deep grooves on the brain. Could this be fissures, sulci, or gyri?',
+   opts:['Fissures — they are the deepest grooves on the brain surface','Sulci — shallow grooves between gyri','Gyri — the raised ridges between grooves','Could be either sulci or fissures, not gyri'],
+   ans:0,exp:'Deep grooves = FISSURES (e.g., longitudinal fissure between hemispheres, lateral fissure/Sylvian fissure). Sulci = shallower grooves separating gyri. Gyri = raised ridges/bumps. Deep = fissures.'},
+  {c:'C',lo:'LO17',lv:'R',author:'Lura',
+   q:'What are the three major components of the diencephalon?',
+   opts:['Thalamus, hypothalamus, epithalamus','Midbrain, pons, medulla','Amygdala, hippocampus, basal ganglia','Cerebrum, cerebellum, brainstem'],
+   ans:0,exp:'Diencephalon = thalamus (sensory relay) + hypothalamus (homeostasis) + epithalamus (pineal gland → melatonin). These three structures sit between the cerebral hemispheres and the brainstem.'},
+  {c:'C',lo:'LO17',lv:'U',author:'Lura',
+   q:'Describe the role of the hypothalamus in homeostasis.',
+   opts:['Regulates temperature, hunger, thirst, sleep-wake cycles, and controls the pituitary gland to maintain internal balance','Only regulates body temperature — other homeostatic functions are elsewhere','Controls voluntary movement to maintain balance','Relays all sensory information without directly affecting homeostasis'],
+   ans:0,exp:'Hypothalamus = master homeostasis regulator. Controls: body temperature, hunger, thirst, sleep-wake cycles, circadian rhythm, sexual behavior, and regulates the pituitary gland (controls most endocrine functions). It\'s the brain\'s drama queen — runs ALL the basic needs.'},
+  {c:'C',lo:'LO17',lv:'A',author:'Lura',
+   q:'A doctor is seeing a patient with seasonal affective disorder. Which diencephalon structure could be responsible?',
+   opts:['Epithalamus — pineal gland secretes melatonin based on light; less winter light = disrupted circadian rhythm','Thalamus — it relays all sensory info including light signals','Hypothalamus — it controls all mood-related homeostasis','Medulla — it regulates sleep-wake cycles'],
+   ans:0,exp:'Epithalamus → pineal gland → melatonin secretion. Less daylight in winter = more melatonin = disrupted circadian rhythm = seasonal affective disorder. The light-season connection is the giveaway that this is the epithalamus/pineal, not hypothalamus.'},
+
+  // ===== CONCEPT D (Kennedi) =====
+  {c:'D',lo:'LO19',lv:'R',author:'Kennedi',
+   q:'What are the key structures visible in a spinal cord cross section?',
+   opts:['H-shaped gray matter with anterior/posterior/lateral horns, white matter columns, and central canal','Only gray matter and white matter with no internal divisions','The meninges, dura, and arachnoid are visible in cross section','Gray matter on the outside, white matter inside (like the brain)'],
+   ans:0,exp:'Spinal cord cross section shows: H-shaped gray matter butterfly with anterior horns (motor), posterior horns (sensory), lateral horns (sympathetic, T1–L2 only); three white matter columns (anterior, posterior, lateral) surrounding the gray; and the tiny central canal in the center.'},
+  {c:'D',lo:'LO19',lv:'U',author:'Kennedi',
+   q:'How would you tell dorsal (posterior) and ventral (anterior) horns apart?',
+   opts:['Posterior horns are narrower and pointed (sensory input); anterior horns are broader and rounded (motor output with larger cell bodies)','Anterior horns are narrower; posterior horns are broader','They are identical in shape — only location distinguishes them','Lateral horns are between anterior and posterior and look the same as both'],
+   ans:0,exp:'Posterior (dorsal) horn = narrower, pointed tips pointing toward the back. Contains interneurons receiving sensory input. Anterior (ventral) horn = broader, rounded, contains large alpha motor neuron cell bodies (LMNs). The larger motor neurons make the anterior horn visibly bigger.'},
+  {c:'D',lo:'LO20',lv:'R',author:'Kennedi',
+   q:'Where is white matter located in the spinal cord?',
+   opts:['On the outside surrounding the gray matter — OPPOSITE of the brain','In the center in an H-shape — same as the brain','Evenly distributed throughout — no distinct zones','Only in the posterior columns'],
+   ans:0,exp:'CRITICAL DISTINCTION: In the spinal cord, white matter is PERIPHERAL (outside) and gray matter is CENTRAL (inside, H-shape). In the BRAIN, it\'s reversed — gray matter cortex is outside, white matter inside. This reversal is a very common exam question.'},
+  {c:'D',lo:'LO20',lv:'U',author:'Kennedi',
+   q:'Why is gray matter located centrally while white matter is peripheral in the spinal cord?',
+   opts:['Motor and sensory cell bodies (gray matter) are centrally placed to receive/send signals; myelinated axon tracts (white matter) run on the outside to carry signals up/down the cord efficiently','It\'s the same organization as the brain — gray outside, white inside','Gray matter is peripheral because it needs blood supply from the outer vessels','There is no functional reason — it is purely anatomical convention'],
+   ans:0,exp:'The gray matter H-shape houses cell bodies (anterior horn motor neurons, posterior horn sensory interneurons) that need to synapse locally. The white matter columns on the outside form long ascending/descending highways that efficiently carry signals between the brain and body.'},
+  {c:'D',lo:'LO21',lv:'R',author:'Kennedi',
+   q:'What is the primary function of the anterior horn of the spinal cord?',
+   opts:['Contains lower motor neuron cell bodies — sends motor signals OUT to skeletal muscles','Receives sensory input from the periphery','Contains sympathetic preganglionic neurons for visceral control','Carries ascending sensory tracts toward the brain'],
+   ans:0,exp:'Anterior horn = MOTOR OUTPUT. Lower motor neuron (LMN) cell bodies live here. Axons exit via the anterior root of the spinal nerve → travel to skeletal muscle. Damage = flaccid paralysis + muscle atrophy + areflexia.'},
+  {c:'D',lo:'LO21',lv:'U',author:'Kennedi',
+   q:'How do the anterior, posterior, and lateral horns work together?',
+   opts:['Posterior receives sensory input → processed → anterior sends motor output; lateral handles autonomic output for visceral control','All three horns perform identical functions','Anterior and lateral are both motor; posterior is purely sensory with no connection to motor','They work independently with no coordination'],
+   ans:0,exp:'Together: Posterior horn receives sensory signals from the body (touch, pain, temp). Interneurons may pass signals to the anterior horn for reflex responses. Anterior horn sends motor commands out to muscles. Lateral horn (T1–L2 only) sends autonomic signals for visceral control. They form a complete local reflex arc.'},
+  {c:'D',lo:'LO22',lv:'R',author:'Kennedi',
+   q:'What structure is formed by the collection of nerve roots below the spinal cord?',
+   opts:['Cauda equina — collection of lumbar and sacral nerve roots below the conus medullaris','Conus medullaris — the tapered end of the spinal cord itself','Filum terminale — the anchoring strand of pia mater','Cauda equina and filum terminale are the same structure'],
+   ans:0,exp:'Cauda equina = Latin for "horse\'s tail." It\'s the bundle of lumbar, sacral, and coccygeal nerve roots descending below the conus medullaris (L1–L2). Because it\'s roots not cord, a lumbar puncture below L2 is safe — roots move aside rather than getting skewered.'},
+  {c:'D',lo:'LO23',lv:'R',author:'Kennedi',
+   q:'Where are lower motor neurons located?',
+   opts:['In the anterior horn of the spinal cord gray matter (and in cranial nerve motor nuclei in the brainstem)','In the posterior horn of the spinal cord','In the white matter columns of the spinal cord','In the cortex of the frontal lobe'],
+   ans:0,exp:'LMNs live in the ANTERIOR HORN of the spinal cord gray matter. Their axons exit via the anterior root → spinal nerve → directly to skeletal muscle. In the head/neck, LMNs are in cranial nerve motor nuclei in the brainstem.'},
+  {c:'D',lo:'LO23',lv:'A',author:'Kennedi',
+   q:'How would symptoms differ if lower motor neurons were damaged instead of upper motor neurons?',
+   opts:['LMN damage = flaccid paralysis + muscle atrophy + no reflexes; UMN damage = spasticity + hyperreflexia + Babinski sign','LMN damage = spasticity; UMN damage = flaccid paralysis (they are opposite to common expectation)','Both produce identical symptoms — you cannot distinguish UMN from LMN damage clinically','LMN damage only causes sensory loss; motor function is preserved'],
+   ans:0,exp:'LMN damage: flaccid (floppy) paralysis, muscle atrophy (wasting), fasciculations, loss of reflexes (areflexia). UMN damage: spastic paralysis, hyperreflexia, Babinski sign (toes fan out), no atrophy. These are classic USMLE/clinical distinctions — know both.'},
+  {c:'D',lo:'LO24',lv:'A',author:'Kennedi',
+   q:'If a pathway carries a signal toward the brain, how would you identify it as sensory or motor?',
+   opts:['Toward the brain = ascending = sensory (afferent); away from brain = descending = motor (efferent)','Toward the brain = motor; away = sensory','Direction does not determine sensory vs motor — only location matters','All ascending tracts are motor; all descending tracts are sensory'],
+   ans:0,exp:'Ascending tracts (toward brain) = sensory/afferent — carrying information from the body up to the brain for processing. Descending tracts (away from brain, toward spinal cord/muscles) = motor/efferent — carrying commands from the brain down to muscles. Direction = function.'},
+
+  // ===== CONCEPT E (Ro Ngun) =====
+  {c:'E',lo:'LO25',lv:'R',author:'Ro Ngun',
+   q:'What are the components that make up a spinal nerve?',
+   opts:['Anterior root (motor) + posterior root (sensory) + posterior root ganglion → spinal nerve → splits into anterior and posterior rami','Anterior root only — the posterior root is a separate nerve','Only the ganglion and the anterior ramus','The spinal nerve is simply a branch of the spinal cord with no roots'],
+   ans:0,exp:'Spinal nerve anatomy: posterior root (sensory fibers from posterior root ganglion) + anterior root (motor fibers from anterior horn) → merge to form spinal nerve → exits intervertebral foramen → immediately splits into posterior ramus (small, back) and anterior ramus (large, forms plexuses).'},
+  {c:'E',lo:'LO25',lv:'U',author:'Ro Ngun',
+   q:'What is the difference in function between the anterior root and posterior root?',
+   opts:['Anterior root = motor (efferent — leaving CNS to muscles); Posterior root = sensory (afferent — coming from body to CNS)','Anterior root = sensory; Posterior root = motor','Both roots carry identical mixed signals','Anterior root carries autonomic signals only; posterior root carries somatic signals'],
+   ans:0,exp:'Bell-Magendie Law: Anterior (ventral) root = MOTOR (efferent). Posterior (dorsal) root = SENSORY (afferent), with the posterior root ganglion containing the sensory cell bodies. Remember: Anterior = Action (motor output). Posterior = Perception (sensory input).'},
+  {c:'E',lo:'LO26',lv:'R',author:'Ro Ngun',
+   q:'List cranial nerves I–XII in order.',
+   opts:['Olfactory, Optic, Oculomotor, Trochlear, Trigeminal, Abducens, Facial, Vestibulocochlear, Glossopharyngeal, Vagus, Accessory, Hypoglossal','Olfactory, Optic, Trochlear, Oculomotor, Trigeminal, Abducens, Facial, Vestibulocochlear, Vagus, Glossopharyngeal, Hypoglossal, Accessory','Optic, Olfactory, Oculomotor, Trigeminal, Abducens, Trochlear, Facial, Vestibulocochlear, Vagus, Glossopharyngeal, Accessory, Hypoglossal','Olfactory, Optic, Oculomotor, Trigeminal, Trochlear, Abducens, Facial, Vestibulocochlear, Glossopharyngeal, Vagus, Accessory, Hypoglossal'],
+   ans:0,exp:'I-Olfactory, II-Optic, III-Oculomotor, IV-Trochlear, V-Trigeminal, VI-Abducens, VII-Facial, VIII-Vestibulocochlear, IX-Glossopharyngeal, X-Vagus, XI-Accessory, XII-Hypoglossal. Mnemonic: Oh Oh Oh To Touch And Feel Very Good Velvet — Ah!'},
+  {c:'E',lo:'LO26',lv:'A',author:'Ro Ngun',
+   q:"You can't smell. Which cranial nerve isn't functioning properly?",
+   opts:['CN I (Olfactory)','CN II (Optic) — vision affects smell perception','CN V (Trigeminal) — face sensation includes smell','CN VII (Facial) — taste and smell are the same nerve'],
+   ans:0,exp:'CN I = Olfactory = smell. Exclusively. It\'s also notable for being the only cranial nerve that projects directly to the cerebral cortex without synapsing in the thalamus first. Anosmia (loss of smell) = CN I problem.'},
+  {c:'E',lo:'LO27',lv:'R',author:'Ro Ngun',
+   q:'Which is larger — anterior or posterior ramus?',
+   opts:['Anterior ramus — supplies limbs and lateral trunk, forms major plexuses','Posterior ramus — it supplies the larger back muscles','They are equal in size','Size varies randomly with no pattern'],
+   ans:0,exp:'Anterior ramus is MUCH larger. It supplies the entire anterior and lateral trunk plus the limbs, and forms the major nerve plexuses (cervical, brachial, lumbar, sacral). Posterior ramus is small — stays home to supply deep back muscles and skin of the back.'},
+  {c:'E',lo:'LO27',lv:'A',author:'Ro Ngun',
+   q:'A patient reports deep back pain. What ramus is most likely affected?',
+   opts:['Posterior ramus — innervates deep back muscles and overlying skin','Anterior ramus — it supplies the back from the front','Both rami equally innervate the back','Neither — back pain is always referred from visceral structures'],
+   ans:0,exp:'Posterior ramus = back specialist. Supplies deep (intrinsic) back muscles and the skin over the posterior trunk. Deep back pain with no limb involvement = posterior ramus territory.'},
+  {c:'E',lo:'LO28',lv:'R',author:'Ro Ngun',
+   q:'Which cranial nerve passes through the optic canal?',
+   opts:['CN II (Optic nerve)','CN III (Oculomotor)','CN VI (Abducens)','CN IV (Trochlear)'],
+   ans:0,exp:'CN II (Optic nerve) passes through the optic canal in the lesser wing of the sphenoid bone. CN III, IV, and VI pass through the superior orbital fissure. CN I fibers pass through the cribriform plate foramina.'},
+  {c:'E',lo:'LO28',lv:'U',author:'Ro Ngun',
+   q:'Why would damage to the internal acoustic meatus affect both hearing and balance?',
+   opts:['CN VIII travels through it with both cochlear (hearing) and vestibular (balance) branches running together','Two separate nerves use this canal for separate functions','CN VII controls balance in addition to facial expression via this canal','Only hearing is affected — balance uses the jugular foramen'],
+   ans:0,exp:'The internal acoustic meatus transmits CN VIII (vestibulocochlear nerve) with BOTH its branches together — cochlear branch (hearing) and vestibular branch (balance). Damage to this meatus = simultaneous loss of both functions on the same side.'},
+  {c:'E',lo:'LO29',lv:'R',author:'Ro Ngun',
+   q:'Name the cranial nerves that are motor only.',
+   opts:['CN III (Oculomotor), IV (Trochlear), VI (Abducens), XI (Accessory), XII (Hypoglossal)','CN I (Olfactory), II (Optic), VIII (Vestibulocochlear)','CN V, VII, IX, X','CN III, VII, IX, X (the parasympathetic ones)'],
+   ans:0,exp:'Motor only: III, IV, VI, XI, XII. Sensory only: I, II, VIII. Mixed (sensory + motor): V, VII, IX, X. Note: III, VII, IX, X are ALSO parasympathetic (they are all mixed). Type mnemonic: Some Say Marry Money But My Brother Says Big Brains Matter More (S=sensory, M=motor, B=both).'},
+  {c:'E',lo:'LO29',lv:'A',author:'Ro Ngun',
+   q:"A patient can't salivate. Is the damaged nerve sensory, motor, both, or parasympathetic?",
+   opts:['Parasympathetic — salivation is stimulated by parasympathetic fibers in CN VII (submandibular/sublingual) and CN IX (parotid)','Motor only — salivary glands are controlled by somatic motor neurons','Sensory only — taste triggers salivary reflex via sensory pathways','Both equally — cannot determine without more information'],
+   ans:0,exp:'Salivation = PARASYMPATHETIC function. CN VII carries parasympathetic fibers to submandibular and sublingual glands. CN IX carries parasympathetic fibers to the parotid gland. No parasympathetic input = dry mouth. This is why anticholinergic drugs (which block ACh) cause dry mouth.'},
+  {c:'E',lo:'LO30',lv:'R',author:'Ro Ngun',
+   q:'Which cranial nerve controls tongue movement?',
+   opts:['CN XII (Hypoglossal)','CN IX (Glossopharyngeal)','CN VII (Facial)','CN V (Trigeminal)'],
+   ans:0,exp:'CN XII = Hypoglossal = "under the tongue." Controls ALL intrinsic tongue muscles and most extrinsic ones. Damage: tongue deviates TOWARD the side of the lesion (weak side can\'t push, strong side pushes it over).'},
+  {c:'E',lo:'LO30',lv:'U',author:'Ro Ngun',
+   q:'Why does eye movement require multiple cranial nerves?',
+   opts:['Three nerves (CN III, IV, VI) each control different extraocular muscles to allow movement in all directions','One nerve could control all eye movements but three exist for redundancy','Eye movement is controlled by CN II only','CN III controls all eye movements — IV and VI are for sensation only'],
+   ans:0,exp:'There are 6 extraocular muscles per eye, each pulling in a different direction. CN III (oculomotor) controls 4 muscles (medial, superior, inferior rectus + inferior oblique). CN IV (trochlear) controls superior oblique (down-in). CN VI (abducens) controls lateral rectus (outward). Three nerves = full range of motion.'},
+  {c:'E',lo:'LO30',lv:'A',author:'Ro Ngun',
+   q:'A patient has difficulty swallowing. What cranial nerves could be involved?',
+   opts:['CN IX (Glossopharyngeal) and CN X (Vagus) — both contribute to pharyngeal muscle control and the swallowing reflex','CN VII and CN XII only','CN III and CN IV — they control throat movement','CN I and CN II initiate the swallowing reflex'],
+   ans:0,exp:'Dysphagia (difficulty swallowing): CN IX supplies stylopharyngeus + initiates gag/swallowing reflex. CN X (vagus) supplies most pharyngeal and laryngeal muscles via pharyngeal plexus. CN XII controls tongue movement also needed for swallowing. IX + X are the primary ones to name.'},
+
+  // ===== CONCEPT F (class questions) =====
+  {c:'F',lo:'LO31',lv:'R',author:'Lura',
+   q:'What are the four functional divisions of the nervous system?',
+   opts:['Afferent, efferent, somatic, visceral','Sensory, motor, central, peripheral','Sympathetic, parasympathetic, somatic, enteric','Cranial, spinal, autonomic, somatic'],
+   ans:0,exp:'Four functional divisions: Afferent (sensory — toward CNS), Efferent (motor — away from CNS), Somatic (skeletal muscle + skin targets — voluntary), Visceral (smooth/cardiac muscle + glands — involuntary/autonomic).'},
+  {c:'F',lo:'LO31',lv:'U',author:'Lura',
+   q:'One division brings the drama to the brain and one acts on it. Afferent or efferent — which is which?',
+   opts:['Afferent brings it IN (drama arrives at brain); efferent acts on it (commands go OUT to muscles)','Efferent brings the drama in; afferent acts on it','Both afferent and efferent carry information toward the brain','They are synonymous — both terms mean the same thing'],
+   ans:0,exp:'Afferent = sensory = Arrives at CNS with information (the drama). Efferent = motor = Exits CNS with commands (acting on the drama). Afferent Arrives, Efferent Exits. Simple.'},
+  {c:'F',lo:'LO31',lv:'A',author:'Lura',
+   q:'You sip hot coffee without checking and immediately regret every decision you have ever made. Is that pain signal traveling toward the CNS or away from it?',
+   opts:['Toward the CNS — afferent sensory signal from tongue to brain','Away from CNS — efferent motor command to drop the cup','Both directions simultaneously','Neither — pain signals bypass the CNS'],
+   ans:0,exp:'Burned tongue pain signal = traveling FROM tongue TOWARD the brain = TOWARD CNS = AFFERENT. The command to put down the cup = efferent. Two separate signals, opposite directions.'},
+  {c:'F',lo:'LO32',lv:'R',author:'Lura',
+   q:'Name one example of a somatic target and one example of a visceral target.',
+   opts:['Somatic: bicep muscle (skeletal). Visceral: stomach (smooth muscle)','Somatic: heart (cardiac muscle). Visceral: bicep (skeletal)','Somatic: sweat gland. Visceral: skin','Somatic and visceral targets are the same thing — both are muscles'],
+   ans:0,exp:'Somatic targets = skeletal muscle (bicep, quadriceps, diaphragm) and skin (sensory receptors). Visceral targets = smooth muscle (gut, blood vessels), cardiac muscle (heart), and glands (sweat glands, salivary glands). Somatic = voluntary; visceral = involuntary.'},
+  {c:'F',lo:'LO32',lv:'U',author:'Lura',
+   q:'Your stomach does flips when you see your crush. Is that a somatic or visceral target reacting?',
+   opts:['Visceral — stomach is smooth muscle, an involuntary visceral target controlled by the autonomic NS','Somatic — you are aware of the sensation so it must be somatic','Both — the stomach has both somatic and visceral innervation equally','Neither — emotional responses are purely psychological with no NS involvement'],
+   ans:0,exp:'Stomach = smooth muscle = visceral target. The autonomic nervous system controls GI motility without your consent. Somatic targets = skeletal muscle + skin (things you consciously control). You did NOT ask for those stomach flips.'},
+  {c:'F',lo:'LO32',lv:'A',author:'Lura',
+   q:'A patient has nerve damage to visceral targets only. Can they still do the stanky leg? Why or why not?',
+   opts:['Yes — stanky leg = skeletal muscle = somatic target, completely unaffected by visceral damage','No — visceral damage affects all muscle movement','Only if they use their arms instead','No — leg muscles contain smooth muscle that is visceral'],
+   ans:0,exp:'YES. Stanky leg = hip/knee/ankle skeletal muscles = somatic targets. Visceral nerve damage only affects smooth muscle, cardiac muscle, and glands. Somatic and visceral pathways are anatomically separate — one does not affect the other.'},
+  {c:'F',lo:'LO33',lv:'U',author:'Lura',
+   q:'Which is responsible for making you awkwardly wave at a stranger you thought you knew — afferent or efferent?',
+   opts:['Efferent — motor command went OUT to your arm before your brain finished processing the visual identification','Afferent — the visual signal arrived too fast','Both fired simultaneously and canceled each other out','Neither — social awkwardness bypasses the nervous system entirely'],
+   ans:0,exp:'Efferent = motor command leaving the CNS. Your brain sent a wave command OUT to your arm muscles before the afferent visual processing was complete. The efferent pathway was faster than the recognition circuit. Deeply relatable neurologically.'},
+  {c:'F',lo:'LO34',lv:'R',author:'Lura',
+   q:'How many neurons does a somatic efferent pathway use to reach its target?',
+   opts:['One — motor neuron goes directly from anterior horn to skeletal muscle, no relay','Two — preganglionic and postganglionic neurons','Three — cortex, spinal cord, then muscle','Varies — depends on the distance to the target muscle'],
+   ans:0,exp:'Somatic efferent = ONE neuron. Cell body in anterior horn → axon travels all the way to the neuromuscular junction at the skeletal muscle. No ganglionic relay. Direct line. Autonomic = TWO neurons (preganglionic → ganglion → postganglionic → organ).'},
+  {c:'F',lo:'LO34',lv:'U',author:'Lura',
+   q:'A visceral pathway stops at a ganglion to pass the blame to a second neuron before reaching the target. Does a somatic pathway do the same?',
+   opts:['No — somatic pathways are one neuron, direct from CNS to skeletal muscle, no ganglion stop','Yes — all efferent pathways require a ganglion relay','Only for long-distance pathways in the legs','Yes, but the ganglion is inside the spinal cord for somatic pathways'],
+   ans:0,exp:'NO. Somatic efferent = 1 neuron, no ganglion. Goes straight from the anterior horn to the muscle. Only autonomic (visceral efferent) pathways use the 2-neuron preganglionic → ganglion → postganglionic system. The ganglion is the distinguishing feature.'},
+  {c:'F',lo:'LO35',lv:'R',author:'Lura',
+   q:'What happens to heart rate and pupil size when the sympathetic nervous system is activated?',
+   opts:['Heart rate INCREASES; pupils DILATE (mydriasis)','Heart rate decreases; pupils constrict','Heart rate increases; pupils constrict','Heart rate decreases; pupils dilate'],
+   ans:0,exp:'Sympathetic (fight-or-flight): HR increases (pump more blood to muscles), pupils dilate/mydriasis (let in more light to see the threat clearly). Parasympathetic = opposite: HR decreases, pupils constrict. This specific organ pair is tested constantly.'},
+  {c:'F',lo:'LO35',lv:'U',author:'Lura',
+   q:'Your body slows digestion when running late for your exam. Which division is responsible for that?',
+   opts:['Sympathetic — stress activates fight-or-flight, which deprioritizes digestion','Parasympathetic — rest-and-digest speeds digestion up when stressed','Somatic — skeletal muscle of the gut is reduced','Afferent — the gut is sensing stress and reporting it'],
+   ans:0,exp:'Sympathetic = SLOWS digestion (blood and energy redirected to muscles and brain during stress). Parasympathetic = REST AND DIGEST (speeds up GI motility when you are relaxed). Being late = sympathetic dominant.'},
+  {c:'F',lo:'LO35',lv:'A',author:'Lura',
+   q:'You see your ex walk into the room. Your heart rate spikes and your pupils dilate. Which division?',
+   opts:['Sympathetic — fight-or-flight activated; heart up, pupils dilate, ex classified as threat','Parasympathetic — you are excited and happy to see them','Somatic motor — skeletal muscle around heart is contracting harder','Both divisions activate simultaneously and balance each other'],
+   ans:0,exp:'Heart rate up + pupils dilate = SYMPATHETIC (fight-or-flight). Norepinephrine released at target organs. The autonomic nervous system does not distinguish between a predator and a former romantic partner. Both = threat. Both = sympathetic activation.'},
+
+  // ===== CONCEPT G (Kadiata) =====
+  {c:'G',lo:'LO36',lv:'R',author:'Kadiata',
+   q:'The eye has tunics (coats) and the ear has three major divisions. Name the tunics of the eye.',
+   opts:['Fibrous tunic (outer), vascular tunic (middle), retina (inner/sensory layer)','Retina (outer), choroid (middle), sclera (inner)','Cornea, lens, vitreous humor','Sclera only — the tunic is a single layer'],
+   ans:0,exp:'Three tunics: (1) Fibrous = sclera + cornea (structural outer layer), (2) Vascular = choroid + ciliary body + iris (middle layer for blood supply and light control), (3) Retina = inner sensory layer with rods and cones.'},
+  {c:'G',lo:'LO37',lv:'R',author:'Kadiata',
+   q:'What parts of the eye allow you to see? What parts of the ear allow you to hear?',
+   opts:['Vision: cornea, lens, retina (rods+cones), CN II → visual cortex. Hearing: pinna, canal, tympanic membrane, ossicles, cochlea, CN VIII → auditory cortex','Vision: iris, sclera, pupil only. Hearing: pinna and tympanic membrane only','Vision: only the retina matters. Hearing: only the cochlea matters','Vision: pupil and lens. Hearing: ossicles and tympanic membrane only'],
+   ans:0,exp:'Vision pathway: cornea (refraction) → pupil → lens → retina (rods + cones → CN II) → occipital lobe. Hearing pathway: pinna → canal → tympanic membrane → ossicles (malleus→incus→stapes) → oval window → cochlea (organ of Corti → CN VIII) → temporal lobe.'},
+  {c:'G',lo:'LO38',lv:'A',author:'Kadiata',
+   q:'Apply: What does the fibrous tunic do? What does the vascular tunic do? What does the retina do?',
+   opts:['Fibrous: structural protection (sclera) + light entry/refraction (cornea). Vascular: blood supply (choroid) + lens shape (ciliary body) + pupil size (iris). Retina: photoreceptors detect light and start neural signals.','Fibrous: blood supply. Vascular: protection. Retina: structural support.','Fibrous and vascular serve identical functions. Retina provides structural support only.','Fibrous: light detection. Vascular: refraction. Retina: blood supply.'],
+   ans:0,exp:'Fibrous tunic: sclera = protection/shape, cornea = refraction (most light-bending happens here). Vascular tunic: choroid = blood supply + light absorption, ciliary body = changes lens shape for accommodation, iris = controls pupil size. Retina: rods (dim light, no color) + cones (color, bright light) initiate the visual signal.'},
+  {c:'G',lo:'LO39',lv:'U',author:'Kadiata',
+   q:'Explain how specific ear structures contribute separately to hearing and equilibrium.',
+   opts:['Hearing: outer+middle ear collect/amplify sound → cochlea converts to nerve signals. Equilibrium: vestibule (utricle+saccule) senses gravity/linear motion; semicircular canals sense rotation','Both hearing and balance use the same structures in the cochlea','Hearing uses the semicircular canals; balance uses the cochlea','The tympanic membrane handles both hearing and balance'],
+   ans:0,exp:'Hearing: outer ear collects → middle ear amplifies → cochlea (organ of Corti) converts fluid movement to neural signals → CN VIII cochlear branch → auditory cortex. Equilibrium: vestibule (utricle/saccule) for linear/gravity → semicircular canals for rotation → CN VIII vestibular branch → brainstem/cerebellum. Separate inner ear systems, same nerve.'},
+  {c:'G',lo:'LO40',lv:'A',author:'Kadiata',
+   q:'Vision is blurry (refraction problem). Which structure is most likely affected?',
+   opts:['Cornea and/or lens — both refract light; myopia/hyperopia result from corneal/lens shape issues','Retina — it causes all types of blurry vision','Optic nerve — it causes blurry vision before other symptoms','Iris — pupil size determines clarity of focus'],
+   ans:0,exp:'Refraction problems (nearsighted/myopia or farsighted/hyperopia) result from the cornea or lens not focusing light precisely on the retina. The cornea does ~70% of refraction; the lens fine-tunes. LASIK reshapes the cornea. Glasses/contacts compensate for the shape mismatch.'},
+  {c:'G',lo:'LO40',lv:'A',author:'Kadiata',
+   q:'A patient feels dizzy and the room spins when they move their head. Which structure is likely affected?',
+   opts:['Semicircular canals (likely BPPV — calcium crystals displaced into canals) or vestibular branch of CN VIII','Cochlea — hearing loss causes dizziness','Tympanic membrane rupture always causes vertigo','The cerebellum is always the cause of dizziness'],
+   ans:0,exp:'Room spinning on head movement = vertigo = vestibular system problem. Most common cause: BPPV (benign paroxysmal positional vertigo) — calcium carbonate crystals (otoliths) displaced from the utricle into semicircular canals → wrong rotation signals → vertigo. Vestibular branch of CN VIII or the canals themselves.'},
+
+  // ===== CONCEPT H (Munira) =====
+  {c:'H',lo:'LO41',lv:'R',author:'Munira',
+   q:'What are the major arteries and veins of the head and neck?',
+   opts:['Arteries: common carotid (→ internal + external), vertebral. Veins: internal jugular, external jugular','Arteries: aorta only. Veins: superior vena cava only','Arteries: facial artery only. Veins: dural sinuses only','Arteries: subclavian, axillary. Veins: basilic, cephalic'],
+   ans:0,exp:'Major arteries: common carotid splits into internal carotid (brain, orbit) and external carotid (face, scalp, neck); vertebral arteries (join to form basilar artery → brain). Major veins: internal jugular (drains brain via dural sinuses) and external jugular (drains superficial face/scalp).'},
+  {c:'H',lo:'LO41',lv:'U',author:'Munira',
+   q:'Why does the internal carotid artery NOT branch as it travels through the neck?',
+   opts:['It is saving all its branches for intracranial structures — it enters the skull without branching to supply the brain and orbit','It branches extensively in the neck to supply the neck muscles','It is too small to branch in the neck','It anastomoses with the vertebral artery in the neck before entering the skull'],
+   ans:0,exp:'The internal carotid artery has no branches in the neck — it enters the carotid canal of the temporal bone and only branches inside the skull to supply intracranial structures (brain, orbit, pituitary). The external carotid does all the neck branching (superior thyroid, facial, occipital, etc.).'},
+  {c:'H',lo:'LO41',lv:'A',author:'Munira',
+   q:'A patient has a severed external carotid artery. What area will lose blood supply?',
+   opts:['Face, scalp, superficial neck, oral cavity, meninges — all extracranial structures it supplies','The brain — the external carotid supplies intracranial structures','Only the neck muscles — the face has its own separate supply','The orbit and eye — those are external carotid territory'],
+   ans:0,exp:'External carotid artery supplies extracranial structures: face (facial artery), scalp (superficial temporal, occipital), oral cavity (lingual, maxillary), meninges (middle meningeal from maxillary). The brain is supplied by the INTERNAL carotid and vertebral arteries.'},
+  {c:'H',lo:'LO42',lv:'R',author:'Munira',
+   q:'What are the major dural venous sinuses?',
+   opts:['Superior sagittal sinus, inferior sagittal sinus, transverse sinus, sigmoid sinus (→ internal jugular)','Internal jugular and external jugular veins','Carotid sinus and cavernous sinus only','Basilar plexus and pterygoid plexus'],
+   ans:0,exp:'Major dural venous sinuses: superior sagittal sinus (runs along top of brain), inferior sagittal sinus, transverse sinuses (left + right), sigmoid sinuses → drain into internal jugular veins at the jugular foramen. They collect venous blood between the dural layers.'},
+  {c:'H',lo:'LO42',lv:'U',author:'Munira',
+   q:'Where does the sigmoid sinus drain into?',
+   opts:['Internal jugular vein at the jugular foramen','External jugular vein at the clavicle','Directly into the heart via the superior vena cava','The vertebral venous plexus'],
+   ans:0,exp:'Sigmoid sinus → curves like an S down to the jugular foramen → becomes the internal jugular vein (IJV). This is the final step of the dural sinus drainage pathway: brain → dural sinuses → sigmoid sinus → IJV → subclavian → SVC → heart.'},
+  {c:'H',lo:'LO43',lv:'R',author:'Munira',
+   q:'Does the internal carotid artery supply inside or outside the cranium?',
+   opts:['Inside — it supplies intracranial structures (brain and orbit)','Outside — it supplies the face and scalp','Both inside and outside equally','Neither — it only supplies the neck'],
+   ans:0,exp:'Internal carotid = INTRAcranial supply (brain, orbit, anterior pituitary). External carotid = EXTRAcranial supply (face, scalp, neck, oral cavity). Simple rule: internal = inside skull. External = outside skull.'},
+  {c:'H',lo:'LO43',lv:'U',author:'Munira',
+   q:'Which jugular vein drains the dural venous sinuses of the brain?',
+   opts:['Internal jugular vein — formed from sigmoid sinus at the jugular foramen','External jugular vein — it collects all cranial venous drainage','Both jugular veins drain the sinuses equally','The subclavian vein drains the sinuses directly'],
+   ans:0,exp:'Internal jugular vein drains the brain via dural venous sinuses → sigmoid sinus → jugular foramen → IJV. The external jugular only drains superficial face and scalp. IJV is significantly larger and more important clinically.'},
+  {c:'H',lo:'LO43',lv:'A',author:'Munira',
+   q:'A patient has swelling in the face but NOT the brain. Which jugular vein is likely blocked?',
+   opts:['External jugular — drains superficial face/scalp (no brain)','Internal jugular — drains the brain','Both jugulars — they drain overlapping territories','Neither — facial swelling is always arterial'],
+   ans:0,exp:'External jugular drains superficial face and scalp. Facial swelling without neurological signs = EJV obstruction. If the IJV were blocked → impaired brain drainage → increased intracranial pressure → neurological signs.'},
+  {c:'H',lo:'LO44',lv:'R',author:'Munira',
+   q:'Where is the internal jugular vein formed?',
+   opts:['At the jugular foramen, where the sigmoid sinus exits the skull','At the clavicle where subclavian and facial veins meet','Inside the cranium from the superior sagittal sinus','At the base of the neck from the external jugular'],
+   ans:0,exp:'The IJV begins at the jugular foramen (in the base of the skull) as the continuation of the sigmoid sinus. It descends through the neck inside the carotid sheath (with the common carotid artery and vagus nerve) and drains into the subclavian vein.'},
+  {c:'H',lo:'LO44',lv:'A',author:'Munira',
+   q:'If blood cannot leave the dural venous sinuses, what happens to intracranial pressure?',
+   opts:['Pressure INCREASES — venous blood backs up in the brain causing congestion','Pressure decreases — less blood in the brain','No change — CSF compensates completely','Blood is rerouted through the external jugular without issue'],
+   ans:0,exp:'Dural sinuses drain venous blood FROM the brain. Obstruction → venous blood backs up → increased intracranial pressure → headache, papilledema (optic disc swelling), visual changes, potentially dangerous. This is why cerebral venous sinus thrombosis is a medical emergency.'},
+  {c:'H',lo:'LO45',lv:'A',author:'Munira',
+   q:'Blood is not draining properly from the head. Which major vein should you check?',
+   opts:['Internal jugular vein — primary drainage route from brain via dural sinuses','External jugular vein — largest head vein','Subclavian vein — receives blood from both jugulars','Facial vein — drains most of the head'],
+   ans:0,exp:'Internal jugular vein is THE primary drainage route from the brain. It collects blood from all dural venous sinuses via the sigmoid sinus. Impaired head drainage = check IJV first for thrombosis or obstruction.'},
+
+  // ===== CONCEPT I (Lucy) =====
+  {c:'I',lo:'LO46',lv:'R',author:'Lucy',
+   q:'List the meningeal layers from superficial to deep.',
+   opts:['Dura mater, arachnoid mater, pia mater (DAP)','Pia mater, arachnoid mater, dura mater','Arachnoid, dura, pia','Dura, pia, arachnoid'],
+   ans:0,exp:'Outside to inside: Dura mater (toughest, outermost), Arachnoid mater (middle — spider-web-like), Pia mater (innermost — directly on brain/cord surface). Mnemonic: DAP — Don\'t Anger Pia.'},
+  {c:'I',lo:'LO46',lv:'U',author:'Lucy',
+   q:'What is the difference between epidural, subdural, and subarachnoid spaces?',
+   opts:['Epidural = between skull/bone and dura; subdural = between dura and arachnoid; subarachnoid = between arachnoid and pia (contains CSF)','Subarachnoid is outermost, epidural is innermost','All three contain equal amounts of CSF','Epidural contains CSF; subarachnoid normally contains blood'],
+   ans:0,exp:'Epidural space = between bone and dura (potential space in cranium; real fat-filled space in spine — target for epidural anesthesia). Subdural space = between dura and arachnoid (potential space — site of subdural hematoma from bridging vein tears). Subarachnoid space = between arachnoid and pia — REAL space filled with CSF.'},
+  {c:'I',lo:'LO46',lv:'A',author:'Lucy',
+   q:'There is a bleed in the subarachnoid space. What danger does it pose?',
+   opts:['Blood mixes with CSF → increased intracranial pressure + meningeal irritation → sudden severe headache, stiff neck, potentially fatal','Subarachnoid bleeds are harmless — the space is designed for fluid','Blood only affects the pia mater with no pressure consequences','The arachnoid villi drain the blood safely into the sinuses'],
+   ans:0,exp:'Subarachnoid hemorrhage (SAH): blood enters the CSF-filled subarachnoid space → severe sudden headache ("worst headache of my life"), meningeal irritation (stiff neck), increased ICP. Often from ruptured berry aneurysm. Medical emergency with high mortality.'},
+  {c:'I',lo:'LO47',lv:'R',author:'Lucy',
+   q:'What are the four major ventricles of the brain?',
+   opts:['Lateral ventricle (L), lateral ventricle (R), third ventricle, fourth ventricle','One lateral, one third, one fourth, one fifth ventricle','Anterior, posterior, lateral, medial ventricles','Third ventricle, fourth ventricle, and cerebral aqueduct (counts as two)'],
+   ans:0,exp:'4 ventricles: LEFT lateral ventricle + RIGHT lateral ventricle (in the cerebral hemispheres) + Third ventricle (midline, surrounded by thalamus/hypothalamus) + Fourth ventricle (between brainstem and cerebellum). Connected by: interventricular foramina of Monro and cerebral aqueduct.'},
+  {c:'I',lo:'LO47',lv:'U',author:'Lucy',
+   q:'What is the role of the choroid plexus in CSF production?',
+   opts:['Specialized ependymal cells + capillaries in the ventricles filter blood to secrete CSF continuously','Choroid plexus reabsorbs CSF — it is not the producer','Choroid plexus is a structural support only and does not make CSF','CSF is made by the arachnoid villi, not the choroid plexus'],
+   ans:0,exp:'Choroid plexus = specialized epithelial cells lining the ventricles (especially lateral) + underlying capillaries. They actively transport ions and water from blood → produce ~500mL CSF/day (only ~150mL circulating at any time since it\'s constantly turned over).'},
+  {c:'I',lo:'LO47',lv:'A',author:'Lucy',
+   q:'In what way does cerebrospinal fluid help protect the brain and spinal cord?',
+   opts:['Buoyancy (reduces effective brain weight from ~1400g to ~50g), cushioning from impacts, and chemical buffer around neural tissue','CSF only lubricates surfaces with no protective function','CSF only carries nutrients — protection is from the meninges alone','CSF has no physical protective role — it is purely chemical'],
+   ans:0,exp:'CSF protection: (1) Buoyancy — the brain floats in CSF, reducing effective weight from ~1400g to ~50g, preventing compression of lower structures. (2) Cushioning — absorbs mechanical shocks. (3) Chemical buffer — stable ionic environment. (4) Waste removal — flushes metabolic waste.'},
+  {c:'I',lo:'LO48',lv:'R',author:'Lucy',
+   q:'What is the purpose of the dural venous sinuses?',
+   opts:['Drain venous blood from the brain AND receive CSF reabsorbed by arachnoid villi/granulations','Only produce CSF within the dural layers','Provide structural support as dural folds only','Carry arterial blood to the brain surface'],
+   ans:0,exp:'Dural venous sinuses serve TWO functions: (1) drain venous blood from the brain (via cerebral veins → sinuses → IJV → heart) and (2) receive CSF reabsorbed through arachnoid granulations (villi) projecting into the sinus lumen. They are enclosed between the periosteal and meningeal dura layers.'},
+  {c:'I',lo:'LO48',lv:'U',author:'Lucy',
+   q:'Why does the cranial dura mater have two layers while the spinal dura mater has only one?',
+   opts:['Cranial dura: periosteal layer (fuses with skull) + meningeal layer. Spinal dura: only meningeal layer (periosteum stays on vertebral bone separately, creating a real epidural space)','Both cranial and spinal dura have two layers — the question is incorrect','Spinal dura is thicker to compensate for having one layer','Cranial dura is one layer; spinal dura has two — the opposite of the question'],
+   ans:0,exp:'Cranial dura has two layers: periosteal (fused to inner skull) + meningeal. Between them = dural venous sinuses. At the foramen magnum, the periosteal layer stays on the bone and the meningeal layer continues as spinal dura — ONE layer. This creates a real EPIDURAL SPACE in the spine (used for epidural anesthesia) that does not exist in the cranium.'},
+  {c:'I',lo:'LO48',lv:'A',author:'Lucy',
+   q:'There is bleeding between the skull and the dura mater. Is it occurring in the cranial or spinal region?',
+   opts:['Cranial — this is an epidural hematoma. In the spine the epidural space is fat-filled, not between bone and dura','Spinal — the epidural space is between bone and dura in the spine','Either region — the anatomy is identical in both places','Neither — this space does not exist anatomically'],
+   ans:0,exp:'Epidural hematoma = cranial. In the CRANIUM, the periosteal dura is normally tightly adhered to the skull — bleeding here (often from middle meningeal artery rupture from temporal bone fracture) strips the dura from the skull, creating the hematoma. In the SPINE, the epidural space already exists and is filled with fat and venous plexuses.'},
+  {c:'I',lo:'LO49',lv:'R',author:'Lucy',
+   q:'What structure produces cerebrospinal fluid?',
+   opts:['Choroid plexus (in the ventricles)','Arachnoid villi (in the subarachnoid space)','Pia mater (innermost meningeal layer)','Dural venous sinuses'],
+   ans:0,exp:'CHOROID PLEXUS produces CSF inside the ventricles. Arachnoid villi/granulations REABSORB it. Know the difference. Flow: choroid plexus → ventricles → subarachnoid space → arachnoid villi → dural sinuses → blood.'},
+  {c:'I',lo:'LO49',lv:'U',author:'Lucy',
+   q:'Why is it important that cerebrospinal fluid flows continuously?',
+   opts:['CSF must constantly circulate to remove metabolic waste, deliver nutrients, and maintain stable pressure — stagnation causes pressure buildup','CSF flow is not important — it can safely stagnate','Continuous flow only matters for temperature regulation','CSF flows to prevent the brain from moving, not for chemical reasons'],
+   ans:0,exp:'Continuous CSF flow is critical for: (1) removing metabolic waste products from neural tissue, (2) delivering nutrients and chemical signals, (3) maintaining constant intracranial pressure, and (4) allowing infection surveillance. Blocked flow = hydrocephalus (pressure buildup).'},
+  {c:'I',lo:'LO50',lv:'R',author:'Lucy',
+   q:'What part of the nervous system is primarily affected by meningitis?',
+   opts:['The meninges — the protective layers surrounding the brain and spinal cord','The brain parenchyma directly','The peripheral nerves throughout the body','The spinal cord white matter tracts'],
+   ans:0,exp:'Meningitis = infection/inflammation of the meninges (the three protective layers). Bacteria or viruses spread through the CSF in the subarachnoid space → inflame meninges → classic triad: fever, severe headache, stiff neck (meningismus). The meninges are the primary target, though encephalitis can coexist.'},
+  {c:'I',lo:'LO50',lv:'A',author:'Lucy',
+   q:'Someone has an infection of the meninges. What structures are being affected?',
+   opts:['Dura mater, arachnoid mater, and pia mater — all three meningeal layers plus the CSF within the subarachnoid space','Only the dura mater — it is the outermost and most exposed','Only the brain parenchyma directly','The dura and the blood-brain barrier simultaneously'],
+   ans:0,exp:'Meningitis affects all three meningeal layers (dura, arachnoid, pia) and critically the CSF within the subarachnoid space — which is how the infection spreads and why lumbar puncture (which samples CSF) is the diagnostic test. CSF will show elevated white cells, elevated protein, possibly low glucose.'},
+];
+
+let state={};
+let shown=[];
+
+const CNAMES={A:'Vertebral column',B:'Axial muscles',C:'Brain structure',D:'Spinal cord',E:'Cranial & spinal nerves',F:'Functional NS',G:'Eye & ear',H:'Circulation',I:'Meninges & ventricles'};
+const LVL={R:'Recall',U:'Understand',A:'Apply'};
+const LCLASS={R:'br',U:'bu',A:'ba'};
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function getFiltered(){
+  const c=document.getElementById('sel-c').value;
+  const l=document.getElementById('sel-l').value;
+  return QS.filter(q=>(c==='all'||q.c===c)&&(l==='all'||q.lv===l));
+}
+
+function buildHTML(qs){
+  if(!qs.length)return '<div class="empty">No questions match those filters.</div>';
+  let html='';
+  let lastC='';
+  qs.forEach((q,i)=>{
+    const key=q.c+'_'+q.lo+'_'+i;
+    const s=state[key]||{answered:false,correct:false,chosen:-1};
+    if(q.c!==lastC){html+=`<div class="section-hdr">Concept ${q.c} — ${CNAMES[q.c]}</div>`;lastC=q.c;}
+    const cc=s.answered?(s.correct?'right':'wrong'):'';
+    html+=`<div class="q-card ${cc}" id="qc${i}"><div class="q-meta"><span class="badge bc">Concept ${q.c}</span><span class="badge bc">${q.lo}</span><span class="badge ${LCLASS[q.lv]}">${LVL[q.lv]}</span><span class="q-author">— ${q.author}</span></div><p class="q-text">${q.q}</p><div class="opts">`;
+    q.opts.forEach((o,j)=>{
+      let cls='opt';
+      if(s.answered){if(j===q.ans)cls+=' correct';else if(j===s.chosen&&j!==q.ans)cls+=' wrong';else cls+=' reveal';}
+      html+=`<button class="${cls}" ${s.answered?'disabled':''} onclick="answer(${i},${j})">${o}</button>`;
+    });
+    html+=`</div>`;
+    if(s.answered)html+=`<div class="fb show ${s.correct?'ok':'no'}">${s.correct?'Correct! ':'Incorrect. '}${q.exp}</div>`;
+    html+=`</div>`;
+  });
+  return html;
+}
+
+function render(){
+  shown=getFiltered();
+  document.getElementById('qwrap').innerHTML=buildHTML(shown);
+  updateScore();
+}
+
+function shuffleRender(){
+  state={};
+  shown=shuffle(getFiltered());
+  let lastC='';
+  let html='';
+  shown.forEach((q,i)=>{
+    const key=q.c+'_'+q.lo+'_'+i;
+    if(q.c!==lastC){html+=`<div class="section-hdr">Concept ${q.c} — ${CNAMES[q.c]}</div>`;lastC=q.c;}
+    html+=`<div class="q-card" id="qc${i}"><div class="q-meta"><span class="badge bc">Concept ${q.c}</span><span class="badge bc">${q.lo}</span><span class="badge ${LCLASS[q.lv]}">${LVL[q.lv]}</span><span class="q-author">— ${q.author}</span></div><p class="q-text">${q.q}</p><div class="opts">`;
+    q.opts.forEach((o,j)=>{
+      html+=`<button class="opt" onclick="answer(${i},${j})">${o}</button>`;
+    });
+    html+=`</div></div>`;
+  });
+  document.getElementById('qwrap').innerHTML=html||'<div class="empty">No questions match those filters.</div>';
+  updateScore();
+}
+
+function answer(qi,chosen){
+  const q=shown[qi];
+  const key=q.c+'_'+q.lo+'_'+qi;
+  const correct=chosen===q.ans;
+  state[key]={answered:true,correct,chosen};
+  const card=document.getElementById('qc'+qi);
+  card.className='q-card '+(correct?'right':'wrong');
+  const btns=card.querySelectorAll('.opt');
+  btns.forEach((b,j)=>{
+    b.disabled=true;
+    if(j===q.ans)b.className='opt correct';
+    else if(j===chosen&&j!==q.ans)b.className='opt wrong';
+    else b.className='opt reveal';
+  });
+  const fb=document.createElement('div');
+  fb.className='fb show '+(correct?'ok':'no');
+  fb.textContent=(correct?'Correct! ':'Incorrect. ')+q.exp;
+  card.appendChild(fb);
+  updateScore();
+}
+
+function updateScore(){
+  let c=0,w=0;
+  shown.forEach((q,i)=>{
+    const s=state[q.c+'_'+q.lo+'_'+i];
+    if(s&&s.answered){s.correct?c++:w++;}
+  });
+  const left=shown.length-c-w;
+  document.getElementById('sc-c').textContent=c;
+  document.getElementById('sc-w').textContent=w;
+  document.getElementById('sc-r').textContent=left;
+  const p=document.getElementById('sc-p');
+  if(c+w===0){p.textContent='—';p.style.color='#888';}
+  else{const pct=Math.round(c/(c+w)*100);p.textContent=pct+'%';p.style.color=pct>=80?'#1D9E75':pct>=60?'#BA7517':'#D85A30';}
+}
+
+function resetAll(){
+  // re-shuffle on reset so answer positions change
+  if(typeof QS!=='undefined') QS.forEach(function(q){
+    var correct=q.opts[q.ans];
+    var arr=q.opts.slice();
+    for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}
+    q.opts=arr;q.ans=arr.indexOf(correct);
+  });
+  state={};render();
+}
+
+// Shuffle before first render
+(function(){
+  if(typeof QS==='undefined') return;
+  QS.forEach(function(q){
+    var correct=q.opts[q.ans];
+    var arr=q.opts.slice();
+    for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}
+    q.opts=arr;q.ans=arr.indexOf(correct);
+  });
+})();
+
+
+  // Shuffle all options before first render
+  QS.forEach(function(q){
+    var correct=q.opts[q.ans];
+    var arr=q.opts.slice();
+    for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}
+    q.opts=arr;q.ans=arr.indexOf(correct);
+  });
+
+render();
+</script>
+
+<script>
+// ANSWER SHUFFLE FIX - randomizes option order so correct answer is not always first
+(function(){
+  var orig = window._shuffleOpts;
+  function shuffle(opts, ans) {
+    var correct = opts[ans];
+    var arr = opts.slice();
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return { opts: arr, ans: arr.indexOf(correct) };
+  }
+  window._shuffleQ = shuffle;
+})();
+</script>
+
+
+<script>
+// Shuffle all question options at page load - correct answer will be random position each time
+(function shuffleAllQuestions() {
+  function shuffleArr(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function shuffleQ(q) {
+    if (!q.opts || q.opts.length === 0) return;
+    var correct = q.opts[q.ans];
+    shuffleArr(q.opts);
+    q.ans = q.opts.indexOf(correct);
+  }
+
+  // Handle DATA object (practical simulator)
+  if (typeof DATA !== 'undefined') {
+    Object.keys(DATA).forEach(function(page) {
+      Object.keys(DATA[page]).forEach(function(qid) {
+        shuffleQ(DATA[page][qid]);
+      });
+    });
+  }
+
+  // Handle QS array (professor quiz, full quiz)
+  if (typeof QS !== 'undefined') {
+    QS.forEach(function(q) { shuffleQ(q); });
+  }
+
+  // Handle ALL_QS array (full quiz alternate name)
+  if (typeof ALL_QS !== 'undefined') {
+    ALL_QS.forEach(function(q) { shuffleQ(q); });
+  }
+
+  // Handle CNS array (cranial nerve quiz)
+  if (typeof CNS !== 'undefined') {
+    CNS.forEach(function(nerve) {
+      if (nerve.qs) nerve.qs.forEach(function(q) { shuffleQ(q); });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
